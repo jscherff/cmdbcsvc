@@ -1,4 +1,4 @@
-// Copyright 2017 John Scherff and Copyright 2012 The Go Authors
+// Copyright 2017 John Scherff | Copyright 2012 The Go Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,30 +25,34 @@ import (
 
 func exePath() (string, error) {
 
-	prog := os.Args[0]
+	check := func(path string) error {
 
-	p, err := filepath.Abs(prog)
+		if fileInfo, err := os.Stat(path); err != nil {
+			return err
+		} else if fileInfo.Mode().IsDir() {
+			return fmt.Errorf(`%s is directory`, path)
+		}
+
+		return nil
+	}
+
+	prog := os.Args[0]
+	path, err := filepath.Abs(prog)
+
 	if err != nil {
 		return ``, err
 	}
 
-	fi, err := os.Stat(p)
-	if err == nil {
-		if !fi.Mode().IsDir() {
-			return p, nil
-		}
-		err = fmt.Errorf(`%s is directory`, p)
+	if err = check(path); err == nil {
+		return path, nil
 	}
 
-	if filepath.Ext(p) == `` {
-		p += `.exe`
-		fi, err := os.Stat(p)
-		if err == nil {
-			if !fi.Mode().IsDir() {
-				return p, nil
-			}
-			err = fmt.Errorf(`%s is directory`, p)
-		}
+	if filepath.Ext(path) == `` {
+		path += `.exe`
+	}
+
+	if err = check(path); err == nil {
+		return path, nil
 	}
 
 	return ``, err
@@ -56,12 +60,14 @@ func exePath() (string, error) {
 
 func installService(name, desc string) (error) {
 
-	exepath, err := exePath()
+	path, err := exePath()
+
 	if err != nil {
 		return err
 	}
 
 	m, err := mgr.Connect()
+
 	if err != nil {
 		return err
 	}
@@ -69,12 +75,14 @@ func installService(name, desc string) (error) {
 	defer m.Disconnect()
 
 	s, err := m.OpenService(name)
+
 	if err == nil {
 		s.Close()
 		return fmt.Errorf("service %s already exists", name)
 	}
 
-	s, err = m.CreateService(name, exepath, mgr.Config{DisplayName: desc}, "is", "auto-started")
+	s, err = m.CreateService(name, path, mgr.Config{DisplayName: desc}, "is", "auto-started")
+
 	if err != nil {
 		return err
 	}
@@ -82,6 +90,7 @@ func installService(name, desc string) (error) {
 	defer s.Close()
 
 	err = eventlog.InstallAsEventCreate(name, eventlog.Error|eventlog.Warning|eventlog.Info)
+
 	if err != nil {
 		s.Delete()
 		return fmt.Errorf("SetupEventLogSource() failed: %s", err)
@@ -93,6 +102,7 @@ func installService(name, desc string) (error) {
 func removeService(name string) (error) {
 
 	m, err := mgr.Connect()
+
 	if err != nil {
 		return err
 	}
@@ -100,6 +110,7 @@ func removeService(name string) (error) {
 	defer m.Disconnect()
 
 	s, err := m.OpenService(name)
+
 	if err != nil {
 		return fmt.Errorf("service %s is not installed", name)
 	}
@@ -107,11 +118,13 @@ func removeService(name string) (error) {
 	defer s.Close()
 
 	err = s.Delete()
+
 	if err != nil {
 		return err
 	}
 
 	err = eventlog.Remove(name)
+
 	if err != nil {
 		return fmt.Errorf("RemoveEventLogSource() failed: %s", err)
 	}

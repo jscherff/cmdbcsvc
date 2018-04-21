@@ -17,7 +17,6 @@ package main
 import (
 	`encoding/json`
 	`os`
-	`sort`
 	`github.com/google/gousb`
 	`github.com/jscherff/cmdb/ci/peripheral/usb`
 )
@@ -34,7 +33,7 @@ func load(t interface{}, cf string) (error) {
 }
 
 // Scan for USB human input devices.
-func scan(inc *Include) (dms []map[string]interface{}, err error) {
+func scan(inc *Include) (Devices, error) {
 
 	ctx := gousb.NewContext()
 	defer ctx.Close()
@@ -54,25 +53,25 @@ func scan(inc *Include) (dms []map[string]interface{}, err error) {
 		return inc.Default
 	}
 
-	devs, _ := ctx.OpenDevices(filter)
+	var devs Devices
+	gdevs, _ := ctx.OpenDevices(filter)
 
-	for _, dev := range devs {
+	for _, gdev := range gdevs {
 
-		var dm map[string]interface{}
+		dev := make(Device)
 
-		if pdev, err := probe(dev); err != nil {
+		if pdev, err := probe(gdev); err != nil {
 			return nil, err
 		} else if j, err := pdev.JSON(); err != nil {
 			return nil, err
-		} else if err := json.Unmarshal(j, &dm); err != nil {
+		} else if err := json.Unmarshal(j, &dev); err != nil {
 			return nil, err
 		} else {
-			dms = append(dms, dm)
+			devs.Add(dev)
 		}
 	}
 
-	sort.Sort(byVidPid(dms))
-	return dms, nil
+	return devs, nil
 }
 
 // Probe USB human input device for configuration settings and attributes.
@@ -88,34 +87,5 @@ func probe(dev *gousb.Device) (usb.Reporter, error) {
 
 	default:
 		return usb.NewGeneric(dev)
-	}
-}
-
-// Type for sorting slice of maps.
-type byVidPid []map[string]interface{}
-
-// Get length of slice.
-func (this byVidPid) Len() int {
-	return len(this)
-}
-
-// Swap slice elements.
-func (this byVidPid) Swap(i, j int) {
-	this[i], this[j] = this[j], this[i]
-}
-
-// Rules for sorting.
-func (this byVidPid) Less(i, j int) bool {
-
-	vi, vj := this[i][`vendor_id`].(string), this[j][`vendor_id`].(string)
-	pi, pj := this[i][`product_id`].(string), this[j][`product_id`].(string)
-	si, sj := this[i][`serial_number`].(string), this[j][`serial_number`].(string)
-
-	if vi != vj {
-		return vi < vj
-	} else if pi != pj {
-		return pi < pj
-	} else {
-		return si < sj
 	}
 }

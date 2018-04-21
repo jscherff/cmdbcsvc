@@ -19,15 +19,25 @@ import (
 	`net/http`
 )
 
-const InventoryTitle = `USB Human Input Device (HID) Inventory for %s`
+func init() {
+	http.HandleFunc(`/`, InventoryHandler)
+}
 
+const (
+	inventoryTitle = `HID Inventory`
+	inventoryCaption = `USB Human Input Device Inventory for %s`
+)
+
+// InventoryHandler responds to HTTP requests for device inventories.
 func InventoryHandler(w http.ResponseWriter, r *http.Request) {
 
-	title := fmt.Sprintf(InventoryTitle, conf.Hostname)
+	caption := fmt.Sprintf(inventoryCaption, conf.Hostname)
 
-	if inventory, err := NewInventory(title); err != nil {
+	if inventory, err := NewInventory(inventoryTitle, caption); err != nil {
 		panic(err)
 	} else {
+		w.Header().Set(`Cache-Control`, `no-store, must-revalidate`)
+		w.Header().Set(`Expires`, `0`)
 		conf.Template.Execute(w, inventory)
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2017 John Scherff and Copyright 2012 The Go Authors
+// Copyright 2017 John Scherff | Copyright 2012 The Go Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import (
 func startService(name string) (error) {
 
 	m, err := mgr.Connect()
+
 	if err != nil {
 		return err
 	}
@@ -32,6 +33,7 @@ func startService(name string) (error) {
 	defer m.Disconnect()
 
 	s, err := m.OpenService(name)
+
 	if err != nil {
 		return fmt.Errorf(`could not access service: %v`, err)
 	}
@@ -39,6 +41,7 @@ func startService(name string) (error) {
 	defer s.Close()
 
 	err = s.Start(`is`, `manual-started`)
+
 	if err != nil {
 		return fmt.Errorf(`could not start service: %v`, err)
 	}
@@ -46,9 +49,10 @@ func startService(name string) (error) {
 	return nil
 }
 
-func controlService(name string, c svc.Cmd, to svc.State) (error) {
+func controlService(name string, cmd svc.Cmd, to svc.State) (error) {
 
 	m, err := mgr.Connect()
+
 	if err != nil {
 		return err
 	}
@@ -56,15 +60,17 @@ func controlService(name string, c svc.Cmd, to svc.State) (error) {
 	defer m.Disconnect()
 
 	s, err := m.OpenService(name)
+
 	if err != nil {
 		return fmt.Errorf(`could not access service: %v`, err)
 	}
 
 	defer s.Close()
 
-	status, err := s.Control(c)
+	status, err := s.Control(cmd)
+
 	if err != nil {
-		return fmt.Errorf(`could not send control=%d: %v`, c, err)
+		return fmt.Errorf(`could not send control=%d: %v`, cmd, err)
 	}
 
 	timeout := time.Now().Add(10 * time.Second)

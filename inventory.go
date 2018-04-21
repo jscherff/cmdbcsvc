@@ -14,16 +14,28 @@
 
 package main
 
+import `time`
+
 type Inventory struct {
 	Title string
-	Devices []map[string]interface{}
+	Caption string
+	Devices Devices
+	DateStamp string
 }
 
-func NewInventory(title string) (*Inventory, error) {
+// NewInventory scans for devices and generates a new inventory.
+func NewInventory(title, caption string) (*Inventory, error) {
 
 	if devices, err := scan(conf.Include); err != nil {
 		return nil, err
 	} else {
-		return &Inventory{title, devices}, nil
+		devices.Sort()
+		this := &Inventory{
+			Title: title,
+			Caption: caption,
+			Devices: devices,
+			DateStamp: time.Now().Format(time.RFC3339),
+		}
+		return this, nil
 	}
 }

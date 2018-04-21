@@ -1,4 +1,4 @@
-// Copyright 2017 John Scherff
+// Copyright 2017 John Scherff | Copyright 2012 The Go Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package main
 import (
 	`fmt`
 	`time`
+
 	`golang.org/x/sys/windows/svc`
 	`golang.org/x/sys/windows/svc/debug`
 	`golang.org/x/sys/windows/svc/eventlog`
@@ -26,14 +27,14 @@ var elog debug.Log
 
 type myservice struct{}
 
-func (m *myservice) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
+func (this *myservice) Execute(args []string, req <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
 
 	const cmdsAccepted = svc.AcceptStop | svc.AcceptShutdown
 
 	changes <- svc.Status{State: svc.StartPending}
 	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
 
-loop:
+	Loop:
 
 	for {
 		go func() {
@@ -42,20 +43,23 @@ loop:
 			}
 		}()
 
-		c := <-r
+		c := <-req
 
 		switch c.Cmd {
 
 		case svc.Interrogate:
+
 			changes <- c.CurrentStatus
 			time.Sleep(100 * time.Millisecond)
 			changes <- c.CurrentStatus
 
 		case svc.Stop, svc.Shutdown:
+
 			if err := conf.Server.Shutdown(nil); err != nil {
 				elog.Error(1, err.Error())
 			}
-			break loop
+
+			break Loop
 
 		default:
 			elog.Error(1, fmt.Sprintf(`unexpected control request #%d`, c))
@@ -77,8 +81,8 @@ func runService(name string, isDebug bool) {
 	}
 
 	defer elog.Close()
-
 	elog.Info(1, fmt.Sprintf(`starting %s service`, name))
+
 	run := svc.Run
 
 	if isDebug {

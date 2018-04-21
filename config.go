@@ -27,6 +27,7 @@ const configFile = `config.json`
 
 var conf = new(Config)
 
+// Config contains the configuration settings for the server.
 type Config struct {
 	Hostname	string
 	Service		*Service
@@ -37,26 +38,40 @@ type Config struct {
 	Resources	[]string
 }
 
+// Service contains the name and description of the windows service.
 type Service struct {
 	Name		string
 	Description	string
 }
 
+// Include determines which devices are returned in the inventory.
 type Include struct {
 	VendorID	map[string]bool
 	ProductID	map[string]map[string]bool
 	Default		bool
 }
 
+// init loads the server configuration.
 func init() {
 
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(log.Flags() | log.Lshortfile)
+	var appDir string
 
-	appDir := filepath.Dir(os.Args[0])
+	// Determine the absolute path of the application directory.
+
+	if path, err := filepath.Abs(os.Args[0]); err != nil {
+		log.Fatal(err)
+	} else {
+		appDir = filepath.Dir(path)
+	}
+
+	// Prepend application directory to config file and load config.
 
 	if err := load(conf, filepath.Join(appDir, configFile)); err != nil {
 		log.Fatal(err)
 	}
+
+	// Obtain the hostname for templates.
 
 	if hn, err := os.Hostname(); err != nil {
 		log.Fatal(err)
@@ -64,9 +79,13 @@ func init() {
 		conf.Hostname = hn
 	}
 
+	// Prepend application directory to template files.
+
 	for index, file := range conf.Templates {
 		conf.Templates[index] = filepath.Join(appDir, file)
 	}
+
+	// Load template files into template.
 
 	if tmpl, err := template.ParseFiles(conf.Templates...); err != nil {
 		log.Fatal(err)
@@ -74,11 +93,14 @@ func init() {
 		conf.Template = tmpl
 	}
 
-	for _, dir := range conf.Resources {
-		path := fmt.Sprintf(`/%s/`, dir)
-		fs := http.FileServer(http.Dir(filepath.Join(appDir, dir)))
-		http.Handle(path, http.StripPrefix(path, fs))
-	}
+	// Process resource paths and configure FileServer handler for each.
 
-	http.HandleFunc(`/`, InventoryHandler)
+	for _, dir := range conf.Resources {
+
+		osPath := filepath.Join(appDir, dir)
+		urlPath := fmt.Sprintf(`/%s/`, dir)
+
+		fs := http.FileServer(http.Dir(osPath))
+		http.Handle(urlPath, http.StripPrefix(urlPath, fs))
+	}
 }
