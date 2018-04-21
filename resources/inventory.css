@@ -17,7 +17,7 @@ caption {
 	font-weight: bold;
 	font-size: 150%;
 	border: 10px solid black;
-	border-radius: 5px 15px;
+	border-radius: 5px 20px;
 	padding-bottom: 5px;
 	margin-bottom: 10px;
 	background-color: Black;
@@ -28,12 +28,10 @@ caption {
 }
 
 table {
-	border-collapse: collapse;
 	font-size: 90%;
-}
-
-tbody {
-	background: linear-gradient(to bottom, white, lightgray);
+	text-align: center;
+	vertical-align: center;
+	border-collapse: collapse;
 }
 
 th, td {
@@ -46,13 +44,9 @@ th {
 	background-color: black;
 }
 
-td {
-	text-align: center;
-	vertical-align: center;
-}
-
 tr {
 	height: 4em;
+	background: linear-gradient(to bottom, white, lightgray);
 }
 
 tr:hover {
