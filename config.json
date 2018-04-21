@@ -1,0 +1,39 @@
+{
+	"Service": {
+		"Name": "cmdbcsvc",
+		"Description": "CMDBc Service"
+	},
+
+	"Server": {
+		"Addr": "localhost:8081",
+		"ReadTimeout": 0,
+		"ReadHeaderTimeout": 0,
+		"WriteTimeout": 0,
+		"IdleTimeout": 0
+	},
+
+	"Include": {
+
+		"VendorID": {
+			"0801": true
+		},
+
+		"ProductID": {
+			"0acd": {
+				"2010": true,
+				"2030": true
+			}
+		},
+
+		"Default": true
+	},
+
+	"Templates": [
+		"templates/inventory.tmpl"
+	],
+
+	"Resources": [
+		"resources"
+	]
+
+}
