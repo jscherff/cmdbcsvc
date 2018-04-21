@@ -22,23 +22,15 @@ import (
 	`golang.org/x/sys/windows/svc/eventlog`
 )
 
-// https://golang.org/pkg/net/http/#Server.Shutdown
-// https://gist.github.com/peterhellberg/38117e546c217960747aacf689af3dc2
-// https://stackoverflow.com/questions/39320025/how-to-stop-http-listenandserve
-
 var elog debug.Log
 
 type myservice struct{}
 
 func (m *myservice) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
 
-	//const cmdsAccepted = svc.AcceptStop | svc.AcceptShutdown | svc.AcceptPauseAndContinue
 	const cmdsAccepted = svc.AcceptStop | svc.AcceptShutdown
 
 	changes <- svc.Status{State: svc.StartPending}
-	//fasttick := time.Tick(500 * time.Millisecond)
-	//slowtick := time.Tick(2 * time.Second)
-	//tick := fasttick
 	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
 
 loop:
@@ -50,11 +42,6 @@ loop:
 			}
 		}()
 
-		//case <-tick:
-		//	elog.Error(1, conf.Server.ListenAndServe().Error())
-		//select {
-
-		//case c := <-r:
 		c := <-r
 
 		switch c.Cmd {
@@ -64,20 +51,11 @@ loop:
 			time.Sleep(100 * time.Millisecond)
 			changes <- c.CurrentStatus
 
-		// timeout could be given instead of nil as a https://golang.org/pkg/context/
 		case svc.Stop, svc.Shutdown:
 			if err := conf.Server.Shutdown(nil); err != nil {
 				elog.Error(1, err.Error())
 			}
 			break loop
-
-			//case svc.Pause:
-				//changes <- svc.Status{State: svc.Paused, Accepts: cmdsAccepted}
-				//tick = slowtick
-
-			//case svc.Continue:
-				//changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
-				//tick = fasttick
 
 		default:
 			elog.Error(1, fmt.Sprintf(`unexpected control request #%d`, c))

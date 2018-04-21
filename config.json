@@ -1,7 +1,7 @@
 {
 	"Service": {
 		"Name": "cmdbcsvc",
-		"Description": "CMDBc Service"
+		"Description": "CMDBc Web Service"
 	},
 
 	"Server": {
