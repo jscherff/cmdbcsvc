@@ -26,7 +26,7 @@ import (
 
 const usageMsg =
 	"%s\n\nUsage: %s <command>\n\twhere <command> is one of\n\t" +
-	"install, remove, start, stop, version, or debug\n"
+	"version, install, remove, start, stop, restart, or debug\n"
 
 var (
 	program string = filepath.Base(os.Args[0])
@@ -62,6 +62,9 @@ func main() {
 
 	switch cmd {
 
+	case `version`:
+		showVersion()
+
 	case `install`:
 		err = installService(conf.Service.Name, conf.Service.Description)
 
@@ -74,8 +77,10 @@ func main() {
 	case `stop`:
 		err = controlService(conf.Service.Name, svc.Stop, svc.Stopped)
 
-	case `version`:
-		showVersion()
+	case `restart`:
+		err = controlService(conf.Service.Name, svc.Stop, svc.Stopped)
+		if err != nil { break }
+		err = startService(conf.Service.Name)
 
 	case `debug`:
 		runService(conf.Service.Name, true)

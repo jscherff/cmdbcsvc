@@ -3,8 +3,8 @@ body {
 }
 
 caption {
-	font-size: 150%;
 	font-weight: bold;
+	font-size: 150%;
 	padding: 15px;
 }
 
@@ -26,11 +26,20 @@ th {
 	background-color: black;
 }
 
+td {
+	text-align: center;
+	vertical-align: center;
+}
+
 tr:hover {
 	background-color: PaleGreen;
 }
 
-td {
+.footer {
+	color: DarkGray;
 	text-align: center;
-	vertical-align: center;
+}
+
+.label {
+	font-weight: bold;
 }
