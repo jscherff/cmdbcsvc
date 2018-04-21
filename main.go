@@ -39,7 +39,7 @@ func showUsage(errmsg string) {
 }
 
 func showVersion() {
-	fmt.Fprintf(os.Stdout, `%s version %s`, program, version)
+	fmt.Fprintf(os.Stdout, `%s %s`, program, version)
 	os.Exit(0)
 }
 
