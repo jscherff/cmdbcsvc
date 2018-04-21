@@ -5,7 +5,7 @@
 	},
 
 	"Server": {
-		"Addr": "localhost:8081",
+		"Addr": "localhost:2424",
 		"ReadTimeout": 0,
 		"ReadHeaderTimeout": 0,
 		"WriteTimeout": 0,
