@@ -6,8 +6,8 @@
     <link href="/resources/inventory.css?v={{.DateStamp}}" type="text/css" rel="stylesheet">
   </head>
   <body>
-    <div class="inventory">
-      <table class="devices">
+    <div class="flex-container">
+      <table>
         <caption>{{.Caption}}</caption>
         <thead>
           <tr>
@@ -40,7 +40,7 @@
           {{end}}
         </tbody>
       </table>
-      <p class="footer"><span class="label">Date:</span> {{.DateStamp}}</p>
+      <p class="datestamp">[{{.DateStamp}}]</p>
     </div>
   </body>
 </html>

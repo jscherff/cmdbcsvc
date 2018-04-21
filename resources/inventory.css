@@ -2,10 +2,29 @@ body {
 	font-family: Verdana, sans-serif;
 }
 
+.flex-container {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: center;
+	min-width: 1000px;
+}
+
 caption {
+	color: white;
+	text-align: right;
+	line-height: 2em;
 	font-weight: bold;
 	font-size: 150%;
-	padding: 15px;
+	border: 10px solid black;
+	border-radius: 5px 15px;
+	padding-bottom: 5px;
+	margin-bottom: 10px;
+	background-color: Black;
+	background-image: url("/resources/logo.png");
+	background-repeat: no-repeat;
+	background-position: left;
+	background-size: auto 100%;
 }
 
 table {
@@ -13,12 +32,13 @@ table {
 	font-size: 90%;
 }
 
-table, th, td {
-	border: 1px solid black;
+tbody {
+	background: linear-gradient(to bottom, white, lightgray);
 }
 
 th, td {
-	padding: 10px;
+	border: 1px solid black;
+	padding: 0em 1em;
 }
 
 th {
@@ -31,15 +51,18 @@ td {
 	vertical-align: center;
 }
 
-tr:hover {
-	background-color: PaleGreen;
+tr {
+	height: 4em;
 }
 
-.footer {
-	color: DarkGray;
+tr:hover {
+	background-color: palegreen;
+}
+
+p {
 	text-align: center;
 }
 
-.label {
-	font-weight: bold;
+.datestamp {
+	color: gray;
 }
