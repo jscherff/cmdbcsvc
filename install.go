@@ -78,10 +78,11 @@ func installService(name, desc string) (error) {
 
 	if err == nil {
 		s.Close()
-		return fmt.Errorf("service %s already exists", name)
+		return fmt.Errorf(`service %s already exists`, name)
 	}
 
-	s, err = m.CreateService(name, path, mgr.Config{DisplayName: desc}, "is", "auto-started")
+	conf := mgr.Config{StartType: mgr.StartAutomatic, DisplayName: desc}
+	s, err = m.CreateService(name, path, conf, `is`, `auto-started`)
 
 	if err != nil {
 		return err
@@ -89,11 +90,14 @@ func installService(name, desc string) (error) {
 
 	defer s.Close()
 
-	err = eventlog.InstallAsEventCreate(name, eventlog.Error|eventlog.Warning|eventlog.Info)
+	err = eventlog.InstallAsEventCreate(
+		name,
+		eventlog.Error|eventlog.Warning|eventlog.Info,
+	)
 
 	if err != nil {
 		s.Delete()
-		return fmt.Errorf("SetupEventLogSource() failed: %s", err)
+		return fmt.Errorf(`SetupEventLogSource() failed: %s`, err)
 	}
 
 	return nil
@@ -112,7 +116,7 @@ func removeService(name string) (error) {
 	s, err := m.OpenService(name)
 
 	if err != nil {
-		return fmt.Errorf("service %s is not installed", name)
+		return fmt.Errorf(`service %s is not installed`, name)
 	}
 
 	defer s.Close()
@@ -126,7 +130,7 @@ func removeService(name string) (error) {
 	err = eventlog.Remove(name)
 
 	if err != nil {
-		return fmt.Errorf("RemoveEventLogSource() failed: %s", err)
+		return fmt.Errorf(`RemoveEventLogSource() failed: %s`, err)
 	}
 
 	return nil
