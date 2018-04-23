@@ -2,37 +2,55 @@ body {
 	font-family: Verdana, sans-serif;
 }
 
-.flex-container {
+.body,
+.header,
+.detail,
+.footer {
 	display: flex;
-	flex-direction: column;
-	flex-wrap: nowrap;
-	justify-content: center;
+}
+
+.body {
+	flex-flow: column nowrap;
 	min-width: 1000px;
 }
 
-caption {
+.header {
+	flex-flow: row nowrap;
+	align-items: center;
+	background-color: black;
+	justify-content: space-between;
+	border: 1px solid Black;
+	border-radius: 5px 25px;
+	margin-bottom: 10px;
+}
+
+.header img {
+	width: auto;
+	height: 50px;
+	padding: 0px 10px;
+}
+
+.header h1 {
 	color: White;
-	text-align: right;
-	line-height: 2em;
 	font-weight: bold;
 	font-size: 150%;
-	border: 10px solid Black;
-	border-radius: 5px 20px;
-	padding-bottom: 5px;
-	margin-bottom: 10px;
-	background-color: Black;
-	background-image: url("/resources/logo.png");
-	background-repeat: no-repeat;
-	background-position: left;
-	background-size: auto 100%;
+	padding: 0px 10px 5px 5px;
+}
+
+.detail {
+	flex-flow: column nowrap;
+	border: 3px solid black;
+	border-radius: 5px;
 }
 
 table {
 	font-size: 90%;
+	color: Black;
 	text-align: center;
 	vertical-align: center;
 	border-collapse: collapse;
 	background-color: rgb(240, 240, 240);
+	width: 100%;
 }
 
 th, td {
@@ -53,10 +71,11 @@ tr:hover {
 	background-color: PaleGreen;
 }
 
-p {
-	text-align: center;
+.footer {
+	flex-flow: row nowrap;
+	justify-content: center;
 }
 
-.datestamp {
+.footer p {
 	color: Gray;
 }

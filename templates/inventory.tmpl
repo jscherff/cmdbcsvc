@@ -6,41 +6,48 @@
     <link href="/resources/inventory.css?v={{.DateStamp}}" type="text/css" rel="stylesheet">
   </head>
   <body>
-    <div class="flex-container">
-      <table>
-        <caption>{{.Caption}}</caption>
-        <thead>
-          <tr>
-            <th>Vendor ID</th>
-            <th>Product ID</th>
-            <th>Vendor Name</th>
-            <th>Product Name</th>
-            <th>Product Version</th>
-            <th>Firmware Version</th>
-            <th>Serial Number</th>
-            <th>USB Port</th>
-            <th>USB Bus</th>
-            <th>Bus Address</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{range .Devices}}
-          <tr>
-            <td>{{.vendor_id}}</td>
-            <td>{{.product_id}}</td>
-            <td>{{.vendor_name}}</td>
-            <td>{{.product_name}}</td>
-            <td>{{.product_ver}}</td>
-            <td>{{.firmware_ver}}</td>
-            <td>{{.serial_number}}</td>
-            <td>{{.port_number}}</td>
-            <td>{{.bus_number}}</td>
-            <td>{{.bus_address}}</td>
-          </tr>
-          {{end}}
-        </tbody>
-      </table>
-      <p class="datestamp">[{{.DateStamp}}]</p>
+    <div class="body">
+      <div class="header">
+        <img src="/resources/logo.png"/>
+        <h1>{{.Caption}}</h1>
+      </div>
+      <div class="detail">
+        <table>
+          <thead>
+            <tr>
+              <th>Vendor ID</th>
+              <th>Product ID</th>
+              <th>Vendor Name</th>
+              <th>Product Name</th>
+              <th>Product Version</th>
+              <th>Firmware Version</th>
+              <th>Serial Number</th>
+              <th>USB Port</th>
+              <th>USB Bus</th>
+              <th>Bus Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .Devices}}
+            <tr>
+              <td>{{.vendor_id}}</td>
+              <td>{{.product_id}}</td>
+              <td>{{.vendor_name}}</td>
+              <td>{{.product_name}}</td>
+              <td>{{.product_ver}}</td>
+              <td>{{.firmware_ver}}</td>
+              <td>{{.serial_number}}</td>
+              <td>{{.port_number}}</td>
+              <td>{{.bus_number}}</td>
+              <td>{{.bus_address}}</td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+      <div class="footer">
+        <p>[{{.DateStamp}}]</p>
+      </div>
     </div>
   </body>
 </html>
