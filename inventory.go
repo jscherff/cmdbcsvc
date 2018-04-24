@@ -17,22 +17,20 @@ package main
 import `time`
 
 type Inventory struct {
-	Title string
-	Caption string
+	Hostname string
 	Devices Devices
 	DateStamp string
 }
 
 // NewInventory scans for devices and generates a new inventory.
-func NewInventory(title, caption string) (*Inventory, error) {
+func NewInventory() (*Inventory, error) {
 
 	if devices, err := scan(conf.Include); err != nil {
 		return nil, err
 	} else {
 		devices.Sort()
 		this := &Inventory{
-			Title: title,
-			Caption: caption,
+			Hostname: conf.Hostname,
 			Devices: devices,
 			DateStamp: time.Now().Format(time.RFC3339),
 		}

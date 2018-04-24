@@ -14,26 +14,16 @@
 
 package main
 
-import (
-	`fmt`
-	`net/http`
-)
+import `net/http`
 
 func init() {
 	http.HandleFunc(`/`, InventoryHandler)
 }
 
-const (
-	inventoryTitle = `HID Inventory`
-	inventoryCaption = `USB Human Input Device Inventory for %s`
-)
-
 // InventoryHandler responds to HTTP requests for device inventories.
 func InventoryHandler(w http.ResponseWriter, r *http.Request) {
 
-	caption := fmt.Sprintf(inventoryCaption, conf.Hostname)
-
-	if inventory, err := NewInventory(inventoryTitle, caption); err != nil {
+	if inventory, err := NewInventory(); err != nil {
 		panic(err)
 	} else {
 		w.Header().Set(`Cache-Control`, `no-store, must-revalidate`)
