@@ -33,8 +33,8 @@ var (
 	version string = `undefined`
 )
 
-func showUsage(errmsg string) {
-	fmt.Fprintf(os.Stderr, usageMsg, errmsg, os.Args[0])
+func showUsage(errMsg string) {
+	fmt.Fprintf(os.Stderr, usageMsg, errMsg, os.Args[0])
 	os.Exit(2)
 }
 
@@ -45,20 +45,23 @@ func showVersion() {
 
 func main() {
 
+	switch len(os.Args) {
+
+	case 1:
+		handleStartup()
+
+	case 2:
+		processCommand(os.Args[1])
+
+	default:
+		showUsage(`invalid command line`)
+	}
+}
+
+func processCommand(cmd string) {
+
 	var err error
-
-	if isInteractive, err := svc.IsAnInteractiveSession(); err != nil {
-		log.Fatalf(`failed to determine if session is interactive: %v`, err)
-	} else if !isInteractive {
-		runService(conf.Service.Name, false)
-		return
-	}
-
-	if len(os.Args) < 2 {
-		showUsage(`no command specified`)
-	}
-
-	cmd := strings.ToLower(os.Args[1])
+	cmd = strings.ToLower(cmd)
 
 	switch cmd {
 
@@ -79,12 +82,10 @@ func main() {
 
 	case `restart`:
 		err = controlService(conf.Service.Name, svc.Stop, svc.Stopped)
-		if err != nil { break }
-		err = startService(conf.Service.Name)
+		if err == nil { err = startService(conf.Service.Name) }
 
 	case `debug`:
 		runService(conf.Service.Name, true)
-		return
 
 	default:
 		showUsage(fmt.Sprintf(`invalid command %s`, cmd))
@@ -93,6 +94,13 @@ func main() {
 	if err != nil {
 		log.Fatalf(`failed to %s %s: %v`, cmd, conf.Service.Name, err)
 	}
+}
 
-	return
+func handleStartup() {
+
+	if interactive, err := svc.IsAnInteractiveSession(); err != nil {
+		log.Fatalf(`failed to determine if session is interactive: %v`, err)
+	} else if !interactive {
+		runService(conf.Service.Name, false)
+	}
 }
