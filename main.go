@@ -25,36 +25,37 @@ import (
 )
 
 const usageMsg =
-	"%s\n\nUsage: %s <command>\n\twhere <command> is one of\n\t" +
-	"version, install, remove, start, stop, restart, or debug\n"
+	"Usage: %s <command>\n\twhere <command> is one of\n\t" +
+	"install, remove, start, stop, restart, debug, version, or help\n\n"
 
 var (
 	program string = filepath.Base(os.Args[0])
 	version string = `undefined`
 )
 
-func showUsage(errMsg string) {
-	fmt.Fprintf(os.Stderr, usageMsg, errMsg, os.Args[0])
-	os.Exit(2)
+func showUsage() {
+	fmt.Fprintf(os.Stderr, usageMsg, os.Args[0])
 }
 
 func showVersion() {
 	fmt.Fprintf(os.Stdout, `%s %s`, program, version)
-	os.Exit(0)
 }
 
 func main() {
 
-	switch len(os.Args) {
-
-	case 1:
-		handleStartup()
-
-	case 2:
+	if len(os.Args) == 2 {
 		processCommand(os.Args[1])
+		return
+	}
 
-	default:
-		showUsage(`invalid command line`)
+	interactive, err := svc.IsAnInteractiveSession()
+
+	if err != nil {
+		log.Fatalf(`failed to determine if session is interactive: %v`, err)
+	} else if interactive {
+		log.Fatalf(`invalid command line for interactive session`)
+	} else {
+		runService(conf.Service.Name, false)
 	}
 }
 
@@ -64,9 +65,6 @@ func processCommand(cmd string) {
 	cmd = strings.ToLower(cmd)
 
 	switch cmd {
-
-	case `version`:
-		showVersion()
 
 	case `install`:
 		err = installService(conf.Service.Name, conf.Service.Description)
@@ -87,20 +85,18 @@ func processCommand(cmd string) {
 	case `debug`:
 		runService(conf.Service.Name, true)
 
+	case `version`:
+		showVersion()
+
+	case `help`:
+		showUsage()
+
 	default:
-		showUsage(fmt.Sprintf(`invalid command %s`, cmd))
+		showUsage()
+		err = fmt.Errorf(`invalid command %s`, cmd)
 	}
 
 	if err != nil {
 		log.Fatalf(`failed to %s %s: %v`, cmd, conf.Service.Name, err)
-	}
-}
-
-func handleStartup() {
-
-	if interactive, err := svc.IsAnInteractiveSession(); err != nil {
-		log.Fatalf(`failed to determine if session is interactive: %v`, err)
-	} else if !interactive {
-		runService(conf.Service.Name, false)
 	}
 }
