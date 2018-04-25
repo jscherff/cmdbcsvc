@@ -25,8 +25,9 @@ import (
 )
 
 const usageMsg =
-	"Usage: %s <command>\n\twhere <command> is one of\n\t" +
-	"install, remove, start, stop, restart, debug, version, or help\n\n"
+	"Usage:\t%s <command>\n\t" +
+	"Where <command> is one of:\n\t" +
+	"install, remove, start, stop, debug, version, or help\n"
 
 var (
 	program string = filepath.Base(os.Args[0])
@@ -34,7 +35,7 @@ var (
 )
 
 func showUsage() {
-	fmt.Fprintf(os.Stderr, usageMsg, os.Args[0])
+	fmt.Fprintf(os.Stderr, usageMsg, program)
 }
 
 func showVersion() {
@@ -53,7 +54,8 @@ func main() {
 	if err != nil {
 		log.Fatalf(`failed to determine if session is interactive: %v`, err)
 	} else if interactive {
-		log.Fatalf(`invalid command line for interactive session`)
+		log.Printf(`invalid command line for interactive session`)
+		showUsage(); os.Exit(2)
 	} else {
 		runService(conf.Service.Name, false)
 	}
@@ -78,10 +80,6 @@ func processCommand(cmd string) {
 	case `stop`:
 		err = controlService(conf.Service.Name, svc.Stop, svc.Stopped)
 
-	case `restart`:
-		err = controlService(conf.Service.Name, svc.Stop, svc.Stopped)
-		if err == nil { err = startService(conf.Service.Name) }
-
 	case `debug`:
 		runService(conf.Service.Name, true)
 
@@ -92,8 +90,8 @@ func processCommand(cmd string) {
 		showUsage()
 
 	default:
-		showUsage()
-		err = fmt.Errorf(`invalid command %s`, cmd)
+		log.Printf(`invalid command %s`, cmd)
+		showUsage(); os.Exit(2)
 	}
 
 	if err != nil {

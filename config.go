@@ -54,7 +54,6 @@ type Include struct {
 // init loads the server configuration.
 func init() {
 
-	log.SetFlags(log.Flags() | log.Lshortfile)
 	var appDir string
 
 	// Determine the absolute path of the application directory.
